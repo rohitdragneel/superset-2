@@ -1,14 +1,23 @@
-FROM apache/superset:latest
+FROM apache/superset:5.0.0
 
 USER root
 
-RUN pip install --no-cache-dir psycopg2-binary "shillelagh[gsheetsapi]" && \
-    python -c "import psycopg2; print('psycopg2:', psycopg2.__version__)"
+# Install PostgreSQL driver
+RUN pip install --no-cache-dir psycopg2-binary
 
+# Install Google Sheets support
+RUN pip install --no-cache-dir "shillelagh[gsheetsapi]"
+
+# Create directory for Google service account
 RUN mkdir -p /app/google
+
+# Copy Google service account
 COPY service-account.json /app/google/service-account.json
 
+# Copy entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+USER superset
 
 ENTRYPOINT ["/entrypoint.sh"]
