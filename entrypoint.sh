@@ -1,39 +1,39 @@
 #!/bin/sh
 set -e
 
-echo "========== PYTHON ENVIRONMENT =========="
-echo "python:"
+echo "========== ENVIRONMENT =========="
+echo "Python:"
 which python || true
 python --version || true
 
-echo "pip:"
+echo "Pip:"
 which pip || true
 pip --version || true
 
-echo "sys.executable:"
-python -c "import sys; print(sys.executable)" || true
+echo "Superset:"
+which superset || true
 
-echo "========== INSTALL psycopg2 =========="
+echo "========== INSTALLING psycopg2 =========="
 pip install --no-cache-dir psycopg2-binary
 
-echo "========== VERIFY psycopg2 =========="
+echo "========== VERIFY SYSTEM PYTHON =========="
 python -c "import psycopg2; print('psycopg2:', psycopg2.__version__)" || true
 
-echo "========== SUPERSET =========="
-which superset || true
-head -1 "$(which superset)" || true
+echo "========== VERIFY SUPERSET PYTHON =========="
+if [ -f /app/.venv/bin/python ]; then
+    echo "Using /app/.venv/bin/python"
+    /app/.venv/bin/python --version || true
 
-echo "========== VENV =========="
-ls -la /app || true
-ls -la /app/.venv || true
-ls -la /app/.venv/bin || true
+    # Install into the venv if pip exists
+    if /app/.venv/bin/python -m pip --version >/dev/null 2>&1; then
+        /app/.venv/bin/python -m pip install --no-cache-dir psycopg2-binary || true
+        /app/.venv/bin/python -c "import psycopg2; print('venv psycopg2:', psycopg2.__version__)" || true
+    else
+        echo "pip not available inside /app/.venv"
+    fi
+fi
 
-echo "========== TEST VENV PYTHON =========="
-/app/.venv/bin/python --version || true
-/app/.venv/bin/python -c "import sys; print(sys.executable)" || true
-/app/.venv/bin/python -c "import psycopg2; print(psycopg2.__version__)" || true
-
-echo "========== SUPERSET START =========="
+echo "========== INITIALIZING SUPERSET =========="
 
 superset db upgrade
 
@@ -45,5 +45,7 @@ superset fab create-admin \
   --password admin123 || true
 
 superset init
+
+echo "========== STARTING SUPERSET =========="
 
 exec /usr/bin/run-server.sh
