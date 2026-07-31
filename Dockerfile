@@ -1,4 +1,5 @@
 FROM apache/superset:latest
+USER root
 
 COPY entrypoint.sh /entrypoint.sh
 
