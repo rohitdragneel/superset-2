@@ -3,6 +3,11 @@ set -e
 echo "Python:"
 which python
 python --version
+echo "Installing psycopg2..."
+pip install --no-cache-dir psycopg2-binary
+
+echo "Verifying installation..."
+python -c "import psycopg2; print(psycopg2.__version__)"
 
 echo "Superset:"
 which superset
