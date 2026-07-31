@@ -1,6 +1,19 @@
 #!/bin/sh
 set -e
+echo "Python:"
+which python
+python --version
 
+echo "Superset:"
+which superset
+
+echo "Pip:"
+which pip
+
+echo "Installed psycopg2:"
+pip show psycopg2-binary || true
+
+/app/.venv/bin/python -m pip show psycopg2-binary || true
 python --version
 which python
 python -c "import psycopg2; print(psycopg2.__version__)"
