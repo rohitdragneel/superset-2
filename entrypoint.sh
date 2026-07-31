@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+python --version
+which python
+python -c "import psycopg2; print(psycopg2.__version__)"
+
 superset db upgrade
 
 superset fab create-admin \
