@@ -1,27 +1,39 @@
 #!/bin/sh
 set -e
-echo "Python:"
-which python
-python --version
-echo "Installing psycopg2..."
+
+echo "========== PYTHON ENVIRONMENT =========="
+echo "python:"
+which python || true
+python --version || true
+
+echo "pip:"
+which pip || true
+pip --version || true
+
+echo "sys.executable:"
+python -c "import sys; print(sys.executable)" || true
+
+echo "========== INSTALL psycopg2 =========="
 pip install --no-cache-dir psycopg2-binary
 
-echo "Verifying installation..."
-python -c "import psycopg2; print(psycopg2.__version__)"
+echo "========== VERIFY psycopg2 =========="
+python -c "import psycopg2; print('psycopg2:', psycopg2.__version__)" || true
 
-echo "Superset:"
-which superset
+echo "========== SUPERSET =========="
+which superset || true
+head -1 "$(which superset)" || true
 
-echo "Pip:"
-which pip
+echo "========== VENV =========="
+ls -la /app || true
+ls -la /app/.venv || true
+ls -la /app/.venv/bin || true
 
-echo "Installed psycopg2:"
-pip show psycopg2-binary || true
+echo "========== TEST VENV PYTHON =========="
+/app/.venv/bin/python --version || true
+/app/.venv/bin/python -c "import sys; print(sys.executable)" || true
+/app/.venv/bin/python -c "import psycopg2; print(psycopg2.__version__)" || true
 
-/app/.venv/bin/python -m pip show psycopg2-binary || true
-python --version
-which python
-python -c "import psycopg2; print(psycopg2.__version__)"
+echo "========== SUPERSET START =========="
 
 superset db upgrade
 
